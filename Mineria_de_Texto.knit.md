@@ -5,13 +5,12 @@ date: "2023-11-20"
 output: pdf_document
 ---
 
-```{r setup, include=TRUE, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-```
+
 
 ## Paquetes para esta sesión
 
-```{r eval=FALSE}
+
+```r
 install.packages("tm")
 install.packages("pdftools")
 install.packages("stopwords")
@@ -19,7 +18,8 @@ install.packages("wordcloud")
 install.packages("quanteda")
 ```
 
-```{r}
+
+```r
 library(tidyverse)
 library(tm)
 library(pdftools)
@@ -38,13 +38,28 @@ Sin embargo, a pesar de sus capacidades, los LLM presentan desafíos importantes
 
 El desarrollo de los LLM es complejo y está por fuera del alcance de esta sesión de clase, puesto que requiere un alto acervo teórico y capacidades computacionales (si se tiene interés en este tema, se sugiere buscar en Google el artículo "_Attention is All You Need_"), por lo que aquí se tratarán las aplicaciones tradicionales del análisis de datos textuales como son la creación de un corpus de texto, la tokenización, el análisis de frecuencias, la visualización de datos y generación de digramas y trigramas.
 
-```{r}
+
+```r
 textos <- c("Soy un dios en mi pueblo y en mi valle.", 
             "No porque me adoren, sino porque yo lo hago.", 
             "Porque me inclino ante quien me regala",
             "Unas granadillas o una sonrisa de su heredad...")
 class(textos)
+```
+
+```
+## [1] "character"
+```
+
+```r
 textos
+```
+
+```
+## [1] "Soy un dios en mi pueblo y en mi valle."        
+## [2] "No porque me adoren, sino porque yo lo hago."   
+## [3] "Porque me inclino ante quien me regala"         
+## [4] "Unas granadillas o una sonrisa de su heredad..."
 ```
 
 
@@ -62,24 +77,54 @@ Un corpus puede ser una colección simple de textos o una estructura más comple
 
 Con el corpus listo, se pueden realizar diversos análisis como la frecuencia de palabras, la co-ocurrencia de términos, el análisis de sentimientos, la clasificación de textos, entre otros. Estos análisis ayudan a extraer _insights_ y patrones de los datos de texto.
 
-```{r}
+
+```r
 vector_fuente <- VectorSource(textos)
 
 corpus <- Corpus(vector_fuente)
 
 class(corpus)
+```
 
+```
+## [1] "SimpleCorpus" "Corpus"
+```
+
+```r
 inspect(corpus) 
+```
+
+```
+## <<SimpleCorpus>>
+## Metadata:  corpus specific: 1, document level (indexed): 0
+## Content:  documents: 4
+## 
+## [1] Soy un dios en mi pueblo y en mi valle.        
+## [2] No porque me adoren, sino porque yo lo hago.   
+## [3] Porque me inclino ante quien me regala         
+## [4] Unas granadillas o una sonrisa de su heredad...
 ```
 
 ## _Term-Document Matrix_
 
 La _Term-Document Matrix_ es una matriz donde cada fila representa un término único (generalmente una palabra) y cada columna representa un documento del corpus. Los elementos de la matriz indican la frecuencia de cada término en cada documento.
 
-```{r}
+
+```r
 tdm <- TermDocumentMatrix(corpus)
 tdm_matrix <- as.matrix(tdm)
 tdm_matrix %>% head()
+```
+
+```
+##          Docs
+## Terms     1 2 3 4
+##   dios    1 0 0 0
+##   pueblo  1 0 0 0
+##   soy     1 0 0 0
+##   valle.  1 0 0 0
+##   adoren, 0 1 0 0
+##   hago.   0 1 0 0
 ```
 
 
@@ -93,8 +138,8 @@ Este proceso ayuda a estandarizar el texto para el análisis posterior. Por ejem
 
 La tokenización es crucial para manejar la diversidad en el uso del lenguaje. Diferentes idiomas y contextos (como el lenguaje coloquial, técnico, o literario) pueden requerir diferentes enfoques de tokenización.
 
-```{r}
 
+```r
 matriz <- as.matrix(tdm)
 
 palabras_frecuencia <- rowSums(matriz)
@@ -102,7 +147,15 @@ palabras_frecuencia <- rowSums(matriz)
 palabras_frecuencia <- sort(palabras_frecuencia, decreasing = TRUE)
 
 palabras_frecuencia
+```
 
+```
+##      porque        dios      pueblo         soy      valle.     adoren, 
+##           3           1           1           1           1           1 
+##       hago.        sino        ante     inclino       quien      regala 
+##           1           1           1           1           1           1 
+## granadillas  heredad...     sonrisa         una        unas 
+##           1           1           1           1           1
 ```
 
 
@@ -112,33 +165,38 @@ El preprocesamiento de un corpus de texto es un conjunto de pasos diseñados par
 
 * Convertir a minúsculas: Hacer que todo el texto sea minúscula para que el análisis no sea sensible a las mayúsculas.
 
-```{r eval=FALSE}
+
+```r
 corpus <- tm_map(corpus, content_transformer(tolower))
 ```
 
 
 * Eliminar puntuación: Quitar los signos de puntuación, ya que generalmente no son necesarios para muchos tipos de análisis.
 
-```{r eval=FALSE}
+
+```r
 corpus <- tm_map(corpus, removePunctuation)
 ```
 
 
 * Eliminar números: Opcionalmente es posible quitar los números si no son relevantes para el análisis.
 
-```{r eval=FALSE}
+
+```r
 corpus <- tm_map(corpus, removeNumbers)
 ```
 
 * Eliminar espacios en blanco extra: Limpiar espacios extra, como los espacios al principio y al final del texto, o múltiples espacios seguidos.
 
-```{r eval=FALSE}
+
+```r
 corpus <- tm_map(corpus, stripWhitespace)
 ```
 
 * Eliminar _stopwords_: Quitar palabras comunes que generalmente no aportan mucho significado al texto, como "el", "la", "y", etc.
 
-```{r eval=FALSE}
+
+```r
 corpus <- tm_map(corpus, removeWords, stopwords("spanish"))
 ```
 
@@ -152,24 +210,45 @@ El paquete `tm`, que significa "Text Mining", es uno de los paquetes más promin
 
 ### Ejemplo
 
-```{r}
+
+```r
 ruta <- 'C:/Users/Ivan Mendivelso/OneDrive - OVERLAP INTERNACIONAL S.A/Documentos/GitHub/Cursos_Overlap/titanic.csv'
 datos <- read.csv2(ruta)
 glimpse(datos)
 ```
 
+```
+## Rows: 1,309
+## Columns: 12
+## $ PassengerId <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,~
+## $ Survived    <int> 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1~
+## $ Pclass      <int> 3, 1, 3, 1, 3, 3, 1, 3, 3, 2, 3, 1, 3, 3, 3, 2, 3, 2, 3, 3~
+## $ Name        <chr> "Braund, Mr. Owen Harris", "Cumings, Mrs. John Bradley (Fl~
+## $ Sex         <chr> "male", "female", "female", "female", "male", "male", "mal~
+## $ Age         <dbl> 22, 38, 26, 35, 35, NA, 54, 2, 27, 14, 4, 58, 20, 39, 14, ~
+## $ SibSp       <int> 1, 1, 0, 1, 0, 0, 0, 3, 0, 1, 1, 0, 0, 1, 0, 0, 4, 0, 1, 0~
+## $ Parch       <int> 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 0, 0, 5, 0, 0, 1, 0, 0, 0~
+## $ Ticket      <chr> "A/5 21171", "PC 17599", "STON/O2. 3101282", "113803", "37~
+## $ Fare        <dbl> 7.2500, 71.2833, 7.9250, 53.1000, 8.0500, 8.4583, 51.8625,~
+## $ Cabin       <chr> NA, "C85", NA, "C123", NA, NA, "E46", NA, NA, NA, "G6", "C~
+## $ Embarked    <chr> "S", "C", "S", "S", "S", "Q", "S", "S", "S", "C", "S", "S"~
+```
 
-```{r}
+
+
+```r
 nombres <- datos$Name
 vector_fuente <- VectorSource(nombres)
 corpus_nombres <- Corpus(vector_fuente)
 ```
 
-```{r eval=FALSE}
+
+```r
 inspect(corpus_nombres)
 ```
 
-```{r}
+
+```r
 corpus_nombres <- tm_map(corpus_nombres, content_transformer(tolower))
 
 corpus_nombres <- tm_map(corpus_nombres, removePunctuation)
@@ -182,15 +261,22 @@ word_freqs <- sort(rowSums(m), decreasing = TRUE)
 head(word_freqs)
 ```
 
+```
+##    miss     mrs william    john  master   henry 
+##     260     201      87      72      61      49
+```
+
 
 ## Stopwords
 
-```{r}
+
+```r
 stopwords_en <- stopwords("en")
 ```
 
 
-```{r}
+
+```r
 corpus_nombres <- tm_map(corpus_nombres, removeWords, stopwords_en)
 
 tdm <- TermDocumentMatrix(corpus_nombres)
@@ -200,6 +286,11 @@ m <- as.matrix(tdm)
 word_freqs <- sort(rowSums(m), decreasing = TRUE)
 
 head(word_freqs)
+```
+
+```
+##    miss     mrs william    john  master   henry 
+##     260     201      87      72      61      49
 ```
 
 
@@ -213,73 +304,38 @@ R ofrece potentes herramientas de visualización como `ggplot2` y `wordcloud` qu
 
 Seleccione un texto en formato PDF para aplicar los conceptos vistos hasta el momento. Use la función `pdf_text()` del paquete `pdftools` para leer el documento. Luego realice los correspondientes procedimientos para aplicar los métodos vistos.
 
-```{r eval=TRUE, echo=FALSE}
-ruta <- "C:/Users/Ivan Mendivelso/OneDrive - OVERLAP INTERNACIONAL S.A/Documentos/GitHub/Cursos_Overlap/funes el memorioso.pdf"
-funes <- pdf_text(ruta)
-vector_fuente <- VectorSource(funes)
-corpus_texto <- Corpus(vector_fuente)
-```
 
-```{r eval=FALSE, echo=FALSE}
-inspect(corpus_texto)
-```
 
-```{r eval=TRUE, echo=FALSE}
-corpus_funes <- tm_map(corpus_texto, content_transformer(tolower))
 
-corpus_funes <- tm_map(corpus_funes, removePunctuation)
 
-corpus_funes <- tm_map(corpus_funes, removeNumbers)
-
-tdm <- TermDocumentMatrix(corpus_funes)
-m <- as.matrix(tdm)
-word_freqs <- sort(rowSums(m), decreasing = TRUE)
-head(word_freqs)
 
 ```
-
-```{r eval=TRUE, echo=FALSE}
-stopwords_es <- stopwords::stopwords("es")
-
-corpus_funes <- tm_map(corpus_funes, removeWords, stopwords_es)
-
-tdm <- TermDocumentMatrix(corpus_funes)
-m <- as.matrix(tdm)
-word_freqs <- sort(rowSums(m), decreasing = TRUE)
-head(word_freqs)
+##   que   del   los   las   una funes 
+##   235    83    79    64    61    59
 ```
 
-```{r eval=TRUE, echo=FALSE}
-df <- data.frame(palabras=as.factor(names(word_freqs)), word_freqs)
 
-df |>
-  filter(word_freqs>10) |>
-  ggplot(aes(x=fct_reorder(palabras, word_freqs), word_freqs)) +
-  geom_col() +
-  coord_flip()
 ```
+##     funes nietzsche  historia   memoria    borges         “ 
+##        59        59        47        34        32        27
+```
+
+![](Mineria_de_Texto_files/figure-latex/unnamed-chunk-22-1.pdf)<!-- --> 
 
 
 ### Wordclouds
 
-```{r eval=TRUE, echo=FALSE}
-wordcloud(names(word_freqs), word_freqs, scale=c(3, 0.5))
-```
+![](Mineria_de_Texto_files/figure-latex/unnamed-chunk-23-1.pdf)<!-- --> 
 
-```{r eval=TRUE, echo=FALSE}
-wordcloud(names(word_freqs),
-          word_freqs,
-          scale=c(3, 0.5),
-          max.words=100,
-          colors=brewer.pal(8, "Dark2"))
-```
+![](Mineria_de_Texto_files/figure-latex/unnamed-chunk-24-1.pdf)<!-- --> 
 
 ## Digramas y trigramas
 
 Los digramas y trigramas son conceptos fundamentales en el procesamiento del lenguaje natural y el análisis de texto. Forman parte de los n-gramas, que son secuencias contiguas de n elementos (o unidades) extraídos de un texto. 
 
 
-```{r}
+
+```r
 texto <- sapply(corpus_texto, as.character)
 
 corpus_quanteda <- corpus(texto)
@@ -291,10 +347,10 @@ tokens_trigrams <- tokens_ngrams(tokens_quanteda, n = 3)
 
 dfm_digramas <- dfm(tokens_digramas)
 dfm_trigrams <- dfm(tokens_trigrams)
-
 ```
 
-```{r}
+
+```r
 top_digramas <- topfeatures(dfm_digramas, 10) 
 
 data_digramas <- data.frame(ngram = names(top_digramas), frequency = top_digramas)
@@ -304,8 +360,9 @@ ggplot(data_digramas, aes(x = reorder(ngram, frequency), y = frequency)) +
     coord_flip() +
     xlab("Digrama") +
     ylab("Frecuencia")
-
 ```
+
+![](Mineria_de_Texto_files/figure-latex/unnamed-chunk-26-1.pdf)<!-- --> 
 
 Elimine las _stopwords_ y realice de nuevo los digramas y trigramas.
 
