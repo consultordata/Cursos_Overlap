@@ -1,7 +1,6 @@
 ---
-title: "Minería de Texto"
-author: "Iván Mendivelso"
-date: "2023-11-20"
+title: "Minería de Texto con R"
+author: "Departamento de _Data_ - Overlap"
 output: pdf_document
 ---
 
@@ -28,7 +27,7 @@ library(wordcloud)
 library(quanteda)
 ```
 
-## Preliminares
+## Análisis de datos textuales con `R`
 
 El análisis de datos textuales, también conocido como minería de texto o _text mining_, permite extraer información valiosa y conocimientos de inmensas cantidades de texto no estructurado. Esta área interdisciplinaria combina técnicas de la lingüística computacional, la estadística, y la inteligencia artificial para procesar, analizar y comprender el lenguaje natural, abriendo puertas a un mundo de posibilidades en diversos campos, desde el marketing hasta la salud. En tiempos recientes, el avance de los modelos de lenguaje de aprendizaje profundo, especialmente los Grandes Modelos de Lenguaje (LLM, por sus siglas en inglés), ha revolucionado aún más este campo. Estos modelos, entrenados en gigantescos corpus de texto, no solo entienden y generan lenguaje natural con una precisión asombrosa, sino que también son capaces de captar matices y contextos complejos, ofreciendo interpretaciones y análisis más ricos y profundos.
 
